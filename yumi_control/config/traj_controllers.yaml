@@ -3,9 +3,6 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 500
 
-
-
-
 # Joint Trajectory Position Controlles ----------------------------------------
 joint_traj_pos_controller_l:
   type: "position_controllers/JointTrajectoryController"
@@ -17,15 +14,6 @@ joint_traj_pos_controller_l:
     - yumi_joint_4_l
     - yumi_joint_5_l
     - yumi_joint_6_l
-  gains:
-    yumi_joint_1_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_2_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_7_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_3_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_4_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_5_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_6_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-
 
 joint_traj_pos_controller_r:
   type: "position_controllers/JointTrajectoryController"
@@ -37,15 +25,6 @@ joint_traj_pos_controller_r:
     - yumi_joint_4_r
     - yumi_joint_5_r
     - yumi_joint_6_r
-  gains:
-    yumi_joint_1_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_2_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_7_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_3_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_4_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_5_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_6_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-
 
 # Joint Trajectory Velocity Controller ----------------------------------------
 joint_traj_vel_controller_l:
@@ -59,16 +38,24 @@ joint_traj_vel_controller_l:
     - yumi_joint_5_l
     - yumi_joint_6_l
   gains:
-    yumi_joint_1_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_2_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_7_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_3_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_4_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_5_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_6_l: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
+    yumi_joint_1_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_2_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_7_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_3_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_4_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_5_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_6_l: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
   constraints:
-    goal_time: 60
-  stop_trajectory_duration: 2
+    goal_time: 1
+  stop_trajectory_duration: 0
+  velocity_ff:
+    yumi_joint_1_l: 1.0
+    yumi_joint_2_l: 1.0
+    yumi_joint_3_l: 1.0
+    yumi_joint_4_l: 1.0
+    yumi_joint_5_l: 1.0
+    yumi_joint_6_l: 1.0
+    yumi_joint_7_l: 1.0
 
 
 
@@ -83,14 +70,21 @@ joint_traj_vel_controller_r:
     - yumi_joint_5_r
     - yumi_joint_6_r
   gains:
-    yumi_joint_1_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_2_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_7_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_3_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_4_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_5_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
-    yumi_joint_6_r: {p: 1.5,  d: 0, i: 0.002, i_clamp: 0.1}
+    yumi_joint_1_r: {p: 1.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_2_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_7_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_3_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_4_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_5_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
+    yumi_joint_6_r: {p: 2.0,  d: 0, i: 0.00, i_clamp: 0.1}
   constraints:
-    goal_time: 60
-
-  stop_trajectory_duration: 2
+    goal_time: 1
+  velocity_ff:
+    yumi_joint_1_r: 1.0
+    yumi_joint_2_r: 1.0
+    yumi_joint_3_r: 1.0
+    yumi_joint_4_r: 1.0
+    yumi_joint_5_r: 1.0
+    yumi_joint_6_r: 1.0
+    yumi_joint_7_r: 1.0
+  stop_trajectory_duration: 0

@@ -118,6 +118,13 @@ public:
      */
     void setJointVelTargets(float (&joint_vel_targets)[N_YUMI_JOINTS]);
 
+    /** \brief sets the joint positions to command to the robot.
+     *
+     * \param joint_pos_targets Array with the joint position commands, where elements 0-6
+     * correspond to the left arm and elements 7-13 correspond to the right arm.
+     */
+    void setJointPosTargets(float (&joint_pos_targets)[N_YUMI_JOINTS]);
+
 protected:
 
 
@@ -179,7 +186,7 @@ protected:
 
     bool initRWS();
 
-    bool initEGM();
+    bool initEGM(bool position);
 
     /** \brief Sends EGM parameters collected from the ROS parameter server to the robot controller through RWS (TCP connection), such as
      * LP filter bandwidth, condition time, etc. For more details see getParams()
@@ -188,7 +195,7 @@ protected:
 
     void setEGMParams(EGMData* egm_data);
 
-    void configureEGM(boost::shared_ptr<EGMInterfaceDefault> egm_interface);
+    void configureEGM(boost::shared_ptr<EGMInterfaceDefault> egm_interface, bool position);
 
     bool startEGM();
 
@@ -217,8 +224,8 @@ protected:
     boost::shared_ptr<abb::egm_interface::proto::Feedback> right_arm_feedback_;
     boost::shared_ptr<abb::egm_interface::proto::RobotStatus> right_arm_status_;
 
-    boost::shared_ptr<abb::egm_interface::proto::JointSpace> left_arm_joint_vel_targets_;
-    boost::shared_ptr<abb::egm_interface::proto::JointSpace> right_arm_joint_vel_targets_;
+    boost::shared_ptr<abb::egm_interface::proto::JointSpace> left_arm_joint_vel_targets_, left_arm_joint_pos_targets_;
+    boost::shared_ptr<abb::egm_interface::proto::JointSpace> right_arm_joint_vel_targets_, right_arm_joint_pos_targets_;
 
     // joint velocity commands sent to the egm interface
 
@@ -230,7 +237,7 @@ protected:
 
     double max_joint_velocity_;
 
-    bool has_params_;
+    bool has_params_, position_;
 
 };
 
@@ -261,7 +268,7 @@ private:
     std::string ip_, port_;
 
     // command buffers
-    float joint_vel_targets_[N_YUMI_JOINTS];
+    float joint_vel_targets_[N_YUMI_JOINTS], joint_pos_targets_[N_YUMI_JOINTS];
 
     // data buffers
     float joint_pos_[N_YUMI_JOINTS];

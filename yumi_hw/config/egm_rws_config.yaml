@@ -11,6 +11,7 @@ rws:
 egm:
 
   comm_timeout: 1.0
+  use_position_mode: false # Set to true to command joint position values to the robot. When false, commands velocities
 
   # tool and work object names,
   # not important for YuMi since EGM control is at the joint level

@@ -50,6 +50,8 @@ YumiEGMInterface::YumiEGMInterface() :
 
     left_arm_joint_vel_targets_.reset(new proto::JointSpace());
     right_arm_joint_vel_targets_.reset(new proto::JointSpace());
+    left_arm_joint_pos_targets_.reset(new proto::JointSpace());
+    right_arm_joint_pos_targets_.reset(new proto::JointSpace());
 
     // preallocate memory for feedback/command messages
     initEGMJointSpaceMessage(left_arm_feedback_->mutable_joints());
@@ -57,6 +59,9 @@ YumiEGMInterface::YumiEGMInterface() :
 
     initEGMJointStateMessage(left_arm_joint_vel_targets_->mutable_speed(), left_arm_joint_vel_targets_->mutable_external_speed());
     initEGMJointStateMessage(right_arm_joint_vel_targets_->mutable_speed(), right_arm_joint_vel_targets_->mutable_external_speed());
+
+    initEGMJointStateMessage(left_arm_joint_pos_targets_->mutable_position(), left_arm_joint_pos_targets_->mutable_external_position());
+    initEGMJointStateMessage(right_arm_joint_pos_targets_->mutable_position(), right_arm_joint_pos_targets_->mutable_external_position());
 
     getParams();
 
@@ -113,6 +118,8 @@ void YumiEGMInterface::getParams()
     nh.param("egm/pos_corr_gain", pos_corr_gain, 0.0);
     egm_params_.setPosCorrGain(pos_corr_gain);
 
+    nh.param("egm/use_position_mode", position_, false);
+
     has_params_ = true;
 }
 
@@ -140,7 +147,7 @@ bool YumiEGMInterface::init(const std::string& ip, const std::string& port)
         return false;
     }
 
-    if (!initEGM())
+    if (!initEGM(position_))
     {
         return false;
     }
@@ -186,6 +193,15 @@ void YumiEGMInterface::setJointVelTargets(float (&joint_vel_targets)[N_YUMI_JOIN
 
     left_arm_egm_interface_->write(*left_arm_joint_vel_targets_);
     right_arm_egm_interface_->write(*right_arm_joint_vel_targets_);
+}
+
+void YumiEGMInterface::setJointPosTargets(float (&joint_pos_targets)[N_YUMI_JOINTS])
+{
+    copyArrayToEGMJointState(joint_pos_targets, left_arm_joint_pos_targets_->mutable_position(), left_arm_joint_pos_targets_->mutable_external_position());
+    copyArrayToEGMJointState(&joint_pos_targets[7], right_arm_joint_pos_targets_->mutable_position(), right_arm_joint_pos_targets_->mutable_external_position());
+
+    left_arm_egm_interface_->write(*left_arm_joint_pos_targets_);
+    right_arm_egm_interface_->write(*right_arm_joint_pos_targets_);
 }
 
 void YumiEGMInterface::initEGMJointSpaceMessage(proto::JointSpace *joint_space_message)
@@ -284,12 +300,12 @@ bool YumiEGMInterface::initRWS()
     return true;
 }
 
-bool YumiEGMInterface::initEGM()
+bool YumiEGMInterface::initEGM(bool position)
 {
     left_arm_egm_interface_.reset(new EGMInterfaceDefault(io_service_, egm_common_values::communication::DEFAULT_PORT_NUMBER));
     right_arm_egm_interface_.reset(new EGMInterfaceDefault(io_service_, egm_common_values::communication::DEFAULT_PORT_NUMBER + 1));
-    configureEGM(left_arm_egm_interface_);
-    configureEGM(right_arm_egm_interface_);
+    configureEGM(left_arm_egm_interface_, position);
+    configureEGM(right_arm_egm_interface_, position);
 
     // create threads for EGM communication
     for(size_t i = 0; i < MAX_NUMBER_OF_EGM_CONNECTIONS; i++)
@@ -335,15 +351,16 @@ void YumiEGMInterface::setEGMParams(EGMData* egm_data)
 
 
 
-void YumiEGMInterface::configureEGM(boost::shared_ptr<EGMInterfaceDefault> egm_interface)
+void YumiEGMInterface::configureEGM(boost::shared_ptr<EGMInterfaceDefault> egm_interface, bool position)
 {
     EGMInterfaceConfiguration configuration = egm_interface->getConfiguration();
 
     configuration.basic.use_conditions = false;
     configuration.basic.axes = EGMInterfaceConfiguration::Seven;
     configuration.basic.execution_mode = EGMInterfaceConfiguration::Direct;
-    configuration.communication.use_speed = true;
+    configuration.communication.use_speed = !position;
     configuration.logging.use_logging = false;
+    configuration.communication.use_position = position;
 
     egm_interface->setConfiguration(configuration);
 }
@@ -470,7 +487,7 @@ void YumiHWEGM::read(ros::Time time, ros::Duration period)
         // joint_velocity_[j] = (joint_position_[j] - joint_position_prev_[j]) / period.toSec();
 
         // Estimation of joint velocity via finite differences method of first order and exponential smoothing
-        joint_velocity_[j] = filters::exponentialSmoothing((joint_position_[j]-joint_position_prev_[j])/period.toSec(), joint_velocity_[j], exponential_smoothing_alpha_); 
+        joint_velocity_[j] = filters::exponentialSmoothing((joint_position_[j]-joint_position_prev_[j])/period.toSec(), joint_velocity_[j], exponential_smoothing_alpha_);
     }
 
     data_buffer_mutex_.unlock();
@@ -491,9 +508,11 @@ void YumiHWEGM::write(ros::Time time, ros::Duration period)
     for (int j = 0; j < n_joints_; j++)
     {
         joint_vel_targets_[j] = joint_velocity_command_[j];
+        joint_pos_targets_[j] = joint_position_command_[j];
     }
 
     yumi_egm_interface_.setJointVelTargets(joint_vel_targets_);
+    yumi_egm_interface_.setJointPosTargets(joint_pos_targets_);
 
     data_buffer_mutex_.unlock();
 }

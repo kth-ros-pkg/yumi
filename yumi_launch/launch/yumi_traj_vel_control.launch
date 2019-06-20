@@ -36,7 +36,8 @@
     <arg name="optodaq_ip_r" default="192.168.125.4"/>
 
     <!-- Velocity estimate smoothing -->
-		<arg name="exponential_smoothing_alpha" default="0.04"/>
+		<arg name="exponential_smoothing_alpha" default="1.0"/>
+    <arg name="control_rate" default="100.0"/>
 
     <!-- The arms hardware interface -->
     <node required="true" name="yumi_hw" pkg="yumi_hw" type="yumi_hw_ifce_node" respawn="false" ns="/yumi" output="screen">
@@ -50,6 +51,7 @@
         <param name="optodaq_ip_l" value="$(arg optodaq_ip_l)"/>
         <param name="optodaq_ip_r" value="$(arg optodaq_ip_r)"/>
         <param name="exponential_smoothing_alpha" value="$(arg exponential_smoothing_alpha)"/>
+        <param name="control_rate" value="$(arg control_rate)"/>
     </node>
 
     <!-- The grippers hardware interface -->
