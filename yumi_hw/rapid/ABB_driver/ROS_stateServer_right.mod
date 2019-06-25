@@ -39,7 +39,7 @@ PROC main()
     TPWrite "StateServer: Waiting for connection.";
 	ROS_init_socket server_socket, server_port;
     ROS_wait_for_client server_socket, client_socket;
-    
+
 	WHILE (TRUE) DO
 		send_joints;
 		WaitTime update_rate;
@@ -59,15 +59,15 @@ ENDPROC
 LOCAL PROC send_joints()
 	VAR ROS_msg_joint_data message;
 	VAR jointtarget joints;
-	
+
     ! get current joint position (degrees)
-	joints := CJointT();
-    
+	joints := CJointT(\TaskName:="T_ROB_R");
+
     ! create message
     message.header := [ROS_MSG_TYPE_JOINT, ROS_COM_TYPE_TOPIC, ROS_REPLY_TYPE_INVALID];
     message.sequence_id := 0;
     message.joints := joints;
-    
+
     ! send message to client
     ROS_send_msg_joint_data client_socket, message;
 
